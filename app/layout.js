@@ -6,7 +6,6 @@ import { ClerkProvider } from "@clerk/nextjs";
 
 const inter = Inter({
   subsets: ["latin"],
-  
 });
 
 export const metadata = {
@@ -16,33 +15,39 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider appearance={{
-      baseTheme: "dark",
-    }}>
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={` ${inter.className} `}
-      >
+    <ClerkProvider
+      appearance={{
+        baseTheme: "dark",
+      }}
+    >
+      <html lang="en" suppressHydrationWarning>
+        <body className={` ${inter.className} `}>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {/* header */}
+            <Header />
+            <main className="min-h-screen">{children}</main>
 
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          {/* header */}
-          <Header />
-          <main className="min-h-screen">{children}</main>
-
-          {/* footer */}
-          <footer className="bg-muted/50 py-12">
-            <div className="container mx-auto text-center px-4 text-gray-200 ">
-              <p>New Project</p>
-            </div>
-          </footer>
-        </ThemeProvider>
-      </body>
-    </html>
+            {/* footer */}
+            <footer className="bg-black border-t border-gray-800 text-muted-foreground">
+              <div className="container mx-auto px-4 py-12 text-center">
+                <h3 className="text-white text-xl font-bold mb-2">SensAI</h3>
+                <p className="text-sm max-w-xl mx-auto">
+                  Your AI-powered career accelerator. Master interviews, grow
+                  your skills, and land your dream role with confidence.
+                </p>
+              </div>
+              <div className="0 text-center text-xs py-4">
+                © {new Date().getFullYear()} SensAI. All rights reserved.
+              </div>
+            </footer>
+          </ThemeProvider>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
