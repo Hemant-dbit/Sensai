@@ -1,9 +1,20 @@
-import React from 'react'
+import { industries } from "@/data/industries";
+import React from "react";
+import { redirect } from "next/navigation";
+import { getUserOnBoardingStatus } from "@/actions/user";
+import OnBoardingForm from "./_components/onboarding-form";
 
-const onBoarding = () => {
+const onBoarding = async () => {
+  const { isOnBoarded } = await getUserOnBoardingStatus();
+
+  if (isOnBoarded) {
+    redirect("/dashboard");
+  }
   return (
-    <div>onBoarding</div>
-  )
-}
+    <main>
+      <OnBoardingForm industries={industries} />
+    </main>
+  );
+};
 
-export default onBoarding
+export default onBoarding;
