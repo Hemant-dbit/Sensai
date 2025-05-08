@@ -2,6 +2,7 @@
 
 import { auth } from "@clerk/nextjs/server";
 import { db } from "@/lib/prisma";
+import { generateAIInsights } from "./dashboard";
 
 export async function updateUser(data) {
   const { userId } = await auth();
@@ -31,10 +32,10 @@ export async function updateUser(data) {
         });
 
         // If industry doesn't exist, create it with default values
-        if (!industryInsight) {
+        if (!industryInsight) { 
           const insights = await generateAIInsights(data.industry);
 
-          industryInsight = await db.industryInsight.create({
+          industryInsight = await tx.industryInsight.create({
             data: {
               industry: data.industry,
               ...insights,
@@ -58,15 +59,15 @@ export async function updateUser(data) {
 
         return { updatedUser, industryInsight };
       },
-      {
-        timeout: 10000, // 20 seconds
-      }
+      // {
+      //   timeout: 10000, // 20 seconds
+      // }
     );
 
-    return result.user;
+    return {success: true , ...result};
   } catch (error) {
     console.error("Error updating user:", error.message);
-    throw new Error("Failed to update user");
+    throw new Error("Failed to update user" + error.message);
   }
 }
 
@@ -98,10 +99,10 @@ export async function getUserOnBoardingStatus() {
     });
 
     return {
-      isOnboarded: !!user?.industry,
+      isOnBoarded: !!user?.industry,
     };
   } catch (error) {
     console.error("Error fetching user onboarding status:", error.message);
-    throw new Error("Failed to fetch user onboarding status");
+    throw new Error("Failed to fetch user onboarding status" + error.message);
   }
 }
