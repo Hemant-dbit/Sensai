@@ -23,8 +23,13 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+import { checkUser } from "@/lib/checkUser";
 
-const Header = () => {
+const Header = async () => {
+
+  await checkUser();
+  
+
   return (
     <header className="fixed top-0 w-full bg-background/150 border-b border-white/8 backdrop-blur-md z-50 supports-[backdrop-filter]:bg-black/40 shadow-lg">
       <nav className="container mx-auto h-16 flex items-center justify-between ">
@@ -60,31 +65,31 @@ hover:border-gray-300 transition-all duration-300 px-4 py-2 rounded-md shadow-sm
                   <ChevronDown className="h-4 w-4 " />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-white shadow-lg rounded-lg mt-2">
+              <DropdownMenuContent className="bg-black text-white-500 shadow-lg rounded-lg mt-2">
                 <DropdownMenuItem>
                   <Link
                     href="/resume"
-                    className="flex items-center gap-2 text-black hover:text-gray-700"
+                    className="flex items-center gap-2  hover:text-white-100"
                   >
-                    <FileText className="h-4 w-4" />
+                    <FileText className="h-4 w-4 text-white-500" />
                     <span>Resume Builder</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link
                     href="/ai-cover-letter"
-                    className="flex items-center gap-2 text-black hover:text-gray-700"
+                    className="flex items-center gap-2 hover:text-gray-700"
                   >
-                    <PenBox className="h-4 w-4" />
+                    <PenBox className="h-4 w-4 text-white-500" />
                     <span>Cover Letter</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
                   <Link
                     href="/interview-prep"
-                    className="flex items-center gap-2 text-black hover:text-gray-700"
+                    className="flex items-center gap-2 hover:text-gray-700"
                   >
-                    <GraduationCap className="h-4 w-4" />
+                    <GraduationCap className="h-4 w-4 text-white-500" />
                     <span>Interview Prep</span>
                   </Link>
                 </DropdownMenuItem>
