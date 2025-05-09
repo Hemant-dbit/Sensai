@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { onboardingSchema } from "@/app/lib/schema";
 import {
   Card,
@@ -26,10 +26,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
+import useFetch from "@/hooks/use-fetch";
+import { updateUser } from "@/actions/user";
+import { toast } from "sonner";   
 
 const OnBoardingForm = ({ industries }) => {
   const router = useRouter();
   const [selectedIndustry, setSelectedIndustry] = useState(null);
+
+  const {
+    loading: updateLoading,
+    fn: updateUserFn,
+    data: updateResult,
+  } = useFetch(updateUser);
 
   const {
     register,
@@ -44,12 +53,42 @@ const OnBoardingForm = ({ industries }) => {
   const watchIndustry = watch("industry");
 
   const onSubmit = async (values) => {
-    console.log("Form submitted:", values);
+    try {
+      const formattedIndustry = `${values.industry}-${values.subIndustry
+        .toLowerCase()
+        .replace(/ /g, "-")}`;
+
+      await updateUserFn({
+        ...values,
+        industry: formattedIndustry,
+      });
+      const result = await updateUserFn({
+        ...values,
+        industry: formattedIndustry,
+      });
+      console.log("Result from updateUserFn:", result);
+      
+    } catch (error) {
+      console.error("Onboarding error:", error);
+    }
   };
+  
+  
+
+
+  useEffect(() => { 
+    console.log("Update result:", updateResult, updateLoading);
+    if (updateResult?.success && !updateLoading) {
+      console.log("Profile completed successfully!");
+      toast.success("Profile completed successfully!");
+      router.push("/dashboard");
+      
+    }
+  }, [updateResult, updateLoading]);
 
   return (
     <div className="flex items-center justify-center w-full h-screen">
-      <Card className="w-full max-w-lg mt-10 mb-10 mx-2 bg-black text-white border-gray-1000 shadow-none">
+      <Card className="w-full max-w-lg mt-25 mb-20 mx-2 bg-black text-white border-gray-1000 shadow-none">
         <CardHeader>
           <CardTitle className="gradient-title text-4xl">
             Complete Your Profile
@@ -91,7 +130,7 @@ const OnBoardingForm = ({ industries }) => {
               </Select>
               {errors.industry && (
                 <p className="text-sm text-red-500">
-                  {errors.industry.message}
+                  {errors.industry?.message}
                 </p>
               )}
             </div>
@@ -118,7 +157,7 @@ const OnBoardingForm = ({ industries }) => {
                 </Select>
                 {errors.subIndustry && (
                   <p className="text-sm text-red-500">
-                    {errors.subIndustry.message}
+                    {errors.subIndustry?.message}
                   </p>
                 )}
               </div>
@@ -136,7 +175,7 @@ const OnBoardingForm = ({ industries }) => {
               />
               {errors.experience && (
                 <p className="text-sm text-red-500">
-                  {errors.experience.message}
+                  {errors.experience?.message}
                 </p>
               )}
             </div>
@@ -152,7 +191,7 @@ const OnBoardingForm = ({ industries }) => {
                 Separate multiple skills with commas
               </p>
               {errors.skills && (
-                <p className="text-sm text-red-500">{errors.skills.message}</p>
+                <p className="text-sm text-red-500">{errors.skills?.message}</p>
               )}
             </div>
 
@@ -165,11 +204,11 @@ const OnBoardingForm = ({ industries }) => {
                 {...register("bio")}
               />
               {errors.bio && (
-                <p className="text-sm text-red-500">{errors.bio.message}</p>
+                <p className="text-sm text-red-500">{errors.bio?.message}</p>
               )}
             </div>
 
-            {/* <Button type="submit" className="w-full" disabled={updateLoading}>
+            <Button type="submit" className="w-full bg-white text-black" disabled={updateLoading}>
               {updateLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -178,14 +217,14 @@ const OnBoardingForm = ({ industries }) => {
               ) : (
                 "Complete Profile"
               )}
-            </Button> */}
+            </Button>
 
-            <Button
+            {/* <Button
               type="submit"
               className="w-full bg-white text-black hover:bg-gray-200"
             >
               Complete Profile
-            </Button>
+            </Button> */}
           </form>
         </CardContent>
       </Card>
