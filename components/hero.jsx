@@ -55,8 +55,10 @@ function HeroSection() {
           <Link href="https://www.youtube.com/roadsidecoder">
             <Button
               size="lg"
-              variant="outline"
-              className="px-8 text-black hover:text-black w-[150px]"
+             
+              className="px-6 py-2 w-[150px] md:w-[150px] bg-white text-black rounded-xl shadow-md hover:bg-black hover:text-white transition-all duration-300 ease-in-out text-sm "
+
+
             >
               Watch Demo
             </Button>
