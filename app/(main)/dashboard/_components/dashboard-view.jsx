@@ -74,14 +74,14 @@ const DashboardView = ({ insights }) => {
   );
 
   return (
-    <div className="space-y-6 bg-black-50">
+    <div className="space-y-6 ">
       <div className="flex justify-between items-center">
         <Badge className="border">Last updated: {lastUpdatedDate}</Badge>
       </div>
 
       {/* Market Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 ">
-        <Card className="bg-black-50">
+        <Card className="bg-black text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-white">
               Market Outlook
@@ -96,7 +96,7 @@ const DashboardView = ({ insights }) => {
           </CardContent>
         </Card>
 
-        <Card className="bg-black-50 text-white">
+        <Card className="bg-black text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Industry Growth
@@ -111,7 +111,7 @@ const DashboardView = ({ insights }) => {
           </CardContent>
         </Card>
 
-        <Card className="bg-black-50 text-white">
+        <Card className="bg-black text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Demand Level</CardTitle>
             <BriefcaseIcon className="h-4 w-4 text-muted-foreground" />
@@ -126,7 +126,7 @@ const DashboardView = ({ insights }) => {
           </CardContent>
         </Card>
 
-        <Card className="bg-black-50 text-white">
+        <Card className="bg-black text-white">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Top Skills</CardTitle>
             <Brain className="h-4 w-4 text-muted-foreground" />
@@ -144,7 +144,7 @@ const DashboardView = ({ insights }) => {
       </div>
 
       {/* Salary Ranges Chart */}
-      <Card className="col-span-4 bg-black-50 ">
+      <Card className="col-span-4 bg-black">
         <CardHeader>
           <CardTitle className="text-white">Salary Ranges by Role</CardTitle>
           <CardDescription>
@@ -186,7 +186,7 @@ const DashboardView = ({ insights }) => {
 
       {/* Industry Trends */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="bg-black-50 text-white" >
+        <Card className="bg-black text-white" >
           <CardHeader>
             <CardTitle>Key Industry Trends</CardTitle>
             <CardDescription>
@@ -205,7 +205,7 @@ const DashboardView = ({ insights }) => {
           </CardContent>
         </Card>
 
-        <Card className="bg-black-50 text-white">
+        <Card className="bg-black text-white">
           <CardHeader>
             <CardTitle>Recommended Skills</CardTitle>
             <CardDescription>Skills to consider developing</CardDescription>
