@@ -9,7 +9,7 @@ export default function MockInterviewPage() {
 
       <div className="flex flex-col space-y-2 mx-2">
         <Link href="/interview">
-          <Button className="gap-2 pl-0" >
+          <Button className="gap-2 pl-0 hover:underline" >
             <ArrowLeft className="h-4 w-4" />
             Back to Interview Preparation
           </Button>
