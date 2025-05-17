@@ -23,19 +23,42 @@ export default function PerformanceChart({ assessments }) {
   const [chartData, setChartData] = useState([]);
 
   useEffect(() => {
-    if (assessments) {
+    if (!assessments || assessments.length === 0) {
+      setChartData([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
       const formattedData = assessments.map((assessment) => ({
         date: format(new Date(assessment.createdAt), "MMM dd"),
         score: assessment.quizScore,
       }));
       setChartData(formattedData);
-    }
+    }, 50);
+
+    return () => clearTimeout(timeoutId);
   }, [assessments]);
 
+  if (!chartData.length) {
+    return (
+      <Card className="bg-black text-white">
+        <CardHeader>
+          <CardTitle className="gradient-title text-3xl md:text-4xl text-left">
+            Performance Trend
+          </CardTitle>
+          <CardDescription>Your quiz scores over time</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[300px] bg-muted rounded animate-pulse"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card className="bg-black text-white ">
-      <CardHeader >
-        <CardTitle className="gradient-title text-3xl md:text-4xl  text-left">
+    <Card className="bg-black text-white">
+      <CardHeader>
+        <CardTitle className="gradient-title text-3xl md:text-4xl text-left">
           Performance Trend
         </CardTitle>
         <CardDescription>Your quiz scores over time</CardDescription>
