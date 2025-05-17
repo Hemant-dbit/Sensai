@@ -79,7 +79,7 @@ hover:border-gray-300 transition-all duration-300 px-4 py-2 rounded-md shadow-sm
                 <DropdownMenuItem>
                   <Link
                     href="/ai-cover-letter"
-                    className="flex items-center gap-2 hover:text-gray-700"
+                    className="flex items-center gap-2 hover:text-white-100"
                   >
                     <PenBox className="h-4 w-4 text-white-500" />
                     <span>Cover Letter</span>
@@ -88,7 +88,7 @@ hover:border-gray-300 transition-all duration-300 px-4 py-2 rounded-md shadow-sm
                 <DropdownMenuItem>
                   <Link
                     href="/interview"
-                    className="flex items-center gap-2 hover:text-gray-700"
+                    className="flex items-center gap-2 hover:text-white-100"
                   >
                     <GraduationCap className="h-4 w-4 text-white-500" />
                     <span>Interview Prep</span>
@@ -114,7 +114,7 @@ hover:border-gray-300 transition-all duration-300 px-4 py-2 rounded-md shadow-sm
             <UserButton
               appearance={{
                 elements: {
-                  avatarBox: "w-16 h-16 !important",
+                  avatarBox: "w-16 h-20 !important",
                   userButtonPopoverCard: "shadow-xl",
                   userPreviewMainIdentifier: "font-semibold",
                 },
