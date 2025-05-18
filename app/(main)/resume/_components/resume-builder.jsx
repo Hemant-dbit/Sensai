@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -23,7 +23,6 @@ import useFetch from "@/hooks/use-fetch";
 import { useUser } from "@clerk/nextjs";
 import { entriesToMarkdown } from "@/app/lib/helper";
 import { resumeSchema } from "@/app/lib/schema";
-import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 
 export default function ResumeBuilder({ initialContent }) {
   const [activeTab, setActiveTab] = useState("edit");
@@ -56,18 +55,16 @@ export default function ResumeBuilder({ initialContent }) {
     error: saveError,
   } = useFetch(saveResume);
 
-  // Watch form fields for preview updates
   const formValues = watch();
 
-  useEffect(() => {
-    if (initialContent) setActiveTab("preview");
-  }, [initialContent]);
-
-  // Update preview content when form values change
+  // Debounced preview update
   useEffect(() => {
     if (activeTab === "edit") {
-      const newContent = getCombinedContent();
-      setPreviewContent(newContent ? newContent : initialContent);
+      const timeoutId = setTimeout(() => {
+        const newContent = getCombinedContent();
+        setPreviewContent(newContent || initialContent);
+      }, 300);
+      return () => clearTimeout(timeoutId);
     }
   }, [formValues, activeTab]);
 
@@ -81,6 +78,26 @@ export default function ResumeBuilder({ initialContent }) {
     }
   }, [saveResult, saveError, isSaving]);
 
+  const getCombinedContent = useMemo(() => {
+    return () => {
+      const { summary, skills, experience, education, projects } = formValues;
+      const parts = [];
+
+      const contactMarkdown = getContactMarkdown();
+      if (contactMarkdown) parts.push(contactMarkdown);
+      if (summary) parts.push(`## Professional Summary\n${summary}`);
+      if (skills) parts.push(`## Skills\n${skills}`);
+      if (experience?.length)
+        parts.push(entriesToMarkdown(experience, "Work Experience"));
+      if (education?.length)
+        parts.push(entriesToMarkdown(education, "Education"));
+      if (projects?.length)
+        parts.push(entriesToMarkdown(projects, "Projects"));
+
+      return parts.join("\n\n");
+    };
+  }, [formValues]);
+
   const getContactMarkdown = () => {
     const { contactInfo } = formValues;
     const parts = [];
@@ -89,25 +106,9 @@ export default function ResumeBuilder({ initialContent }) {
     if (contactInfo.linkedin)
       parts.push(`💼 [LinkedIn](${contactInfo.linkedin})`);
     if (contactInfo.twitter) parts.push(`🐦 [Twitter](${contactInfo.twitter})`);
-
     return parts.length > 0
-      ? `## <div align="center">${user.fullName}</div>
-        \n\n<div align="center">\n\n${parts.join(" | ")}\n\n</div>`
+      ? `## <div align="center">${user.fullName}</div>\n<div align="center">\n${parts.join(" | ")}\n</div>`
       : "";
-  };
-
-  const getCombinedContent = () => {
-    const { summary, skills, experience, education, projects } = formValues;
-    return [
-      getContactMarkdown(),
-      summary && `## Professional Summary\n\n${summary}`,
-      skills && `## Skills\n\n${skills}`,
-      entriesToMarkdown(experience, "Work Experience"),
-      entriesToMarkdown(education, "Education"),
-      entriesToMarkdown(projects, "Projects"),
-    ]
-      .filter(Boolean)
-      .join("\n\n");
   };
 
   const [isGenerating, setIsGenerating] = useState(false);
@@ -115,6 +116,7 @@ export default function ResumeBuilder({ initialContent }) {
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
+      const html2pdf = (await import("html2pdf.js")).default;
       const element = document.getElementById("resume-pdf");
       const opt = {
         margin: [15, 15],
@@ -123,10 +125,10 @@ export default function ResumeBuilder({ initialContent }) {
         html2canvas: { scale: 2 },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
       };
-
       await html2pdf().set(opt).from(element).save();
     } catch (error) {
       console.error("PDF generation error:", error);
+      toast.error("Failed to generate PDF");
     } finally {
       setIsGenerating(false);
     }
@@ -135,14 +137,13 @@ export default function ResumeBuilder({ initialContent }) {
   const onSubmit = async (data) => {
     try {
       const formattedContent = previewContent
-        .replace(/\n/g, "\n") // Normalize newlines
-        .replace(/\n\s*\n/g, "\n\n") // Normalize multiple newlines to double newlines
+        .replace(/\r?\n/g, "\n")
+        .replace(/\s*\n\s*/g, "\n\n")
         .trim();
-
-      console.log(previewContent, formattedContent);
-      await saveResumeFn(previewContent);
+      await saveResumeFn(formattedContent);
     } catch (error) {
       console.error("Save error:", error);
+      toast.error("Failed to save resume");
     }
   };
 
@@ -185,12 +186,12 @@ export default function ResumeBuilder({ initialContent }) {
           </Button>
         </div>
       </div>
-       <Tabs value={activeTab} onValueChange={setActiveTab}>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="edit">Form</TabsTrigger>
           <TabsTrigger value="preview">Markdown</TabsTrigger>
         </TabsList>
-
         <TabsContent value="edit">
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -232,7 +233,7 @@ export default function ResumeBuilder({ initialContent }) {
                   <Input
                     {...register("contactInfo.linkedin")}
                     type="url"
-                    placeholder="https://linkedin.com/in/your-profile"
+                    placeholder="https://linkedin.com/in/your-profile "
                   />
                   {errors.contactInfo?.linkedin && (
                     <p className="text-sm text-red-500">
@@ -247,7 +248,7 @@ export default function ResumeBuilder({ initialContent }) {
                   <Input
                     {...register("contactInfo.twitter")}
                     type="url"
-                    placeholder="https://twitter.com/your-handle"
+                    placeholder="https://twitter.com/your-handle "
                   />
                   {errors.contactInfo?.twitter && (
                     <p className="text-sm text-red-500">
@@ -257,7 +258,6 @@ export default function ResumeBuilder({ initialContent }) {
                 </div>
               </div>
             </div>
-
             {/* Summary */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Professional Summary</h3>
@@ -277,7 +277,6 @@ export default function ResumeBuilder({ initialContent }) {
                 <p className="text-sm text-red-500">{errors.summary.message}</p>
               )}
             </div>
-
             {/* Skills */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Skills</h3>
@@ -297,7 +296,6 @@ export default function ResumeBuilder({ initialContent }) {
                 <p className="text-sm text-red-500">{errors.skills.message}</p>
               )}
             </div>
-
             {/* Experience */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Work Experience</h3>
@@ -318,7 +316,6 @@ export default function ResumeBuilder({ initialContent }) {
                 </p>
               )}
             </div>
-
             {/* Education */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Education</h3>
@@ -339,7 +336,6 @@ export default function ResumeBuilder({ initialContent }) {
                 </p>
               )}
             </div>
-
             {/* Projects */}
             <div className="space-y-4">
               <h3 className="text-lg font-medium">Projects</h3>
@@ -362,7 +358,6 @@ export default function ResumeBuilder({ initialContent }) {
             </div>
           </form>
         </TabsContent>
-
         <TabsContent value="preview">
           {activeTab === "preview" && (
             <Button
@@ -386,7 +381,6 @@ export default function ResumeBuilder({ initialContent }) {
               )}
             </Button>
           )}
-
           {activeTab === "preview" && resumeMode !== "preview" && (
             <div className="flex p-3 gap-2 items-center border-2 border-yellow-600 text-yellow-600 rounded mb-2">
               <AlertTriangle className="h-5 w-5" />
