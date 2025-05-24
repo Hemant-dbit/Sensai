@@ -52,17 +52,7 @@ function HeroSection() {
               Get Started
             </Button>
           </Link>
-          {/* <Link href="https://www.youtube.com/roadsidecoder">
-            <Button
-              size="lg"
-             
-              className="px-6 py-2 w-[150px] md:w-[150px] bg-white text-black rounded-xl shadow-md hover:bg-black hover:text-white transition-all duration-300 ease-in-out text-sm "
-
-
-            >
-              Watch Demo
-            </Button>
-          </Link> */}
+         
         </div>
         <div className="hero-image-wrapper mt-5 md:mt-0 mb-10">
           <div ref={imageRef} className="hero-image ">
